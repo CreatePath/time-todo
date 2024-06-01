@@ -28,8 +28,6 @@ LANGUAGE_CODE = 'ko-KR'
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-@xc)s)89mcuwp4&c^g$x!%37ouo1im0tk_xvxh)agkn(65q$w4'
 
-AUTH_USER_MODEL = 'common.User'
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 

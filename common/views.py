@@ -2,8 +2,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.views import View
 from django.contrib.auth import authenticate, logout, login
-
-from .models import User
+from django.contrib.auth.models import User
 from .forms import SignUpForm
 
 class LoginView(View):
@@ -15,10 +14,10 @@ class LoginView(View):
         password = request.POST["password"]
         user = authenticate(request, username=username, password=password)
         print(user)
-        if user is None:
-            return render(request, 'common/login.html')
-        login(request, user)
-        return redirect("/")
+        if user is not None:
+            login(request, user)
+            return redirect('/')
+        return redirect("common:login")
 
 
 
@@ -37,7 +36,7 @@ class SignUpView(View):
         if User.objects.filter(username=form.cleaned_data["username"]):
             return JsonResponse({"message": "이미 존재하는 아이디입니다."}, status=400)
 
-        user = User.objects.create(username=form.cleaned_data["username"],
+        user = User.objects.create_user(username=form.cleaned_data["username"],
                                     password=form.cleaned_data["password"],
                                     first_name=form.cleaned_data["first_name"],
                                     last_name=form.cleaned_data["last_name"],
