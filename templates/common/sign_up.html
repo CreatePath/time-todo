@@ -28,18 +28,18 @@
             {% for field in form %}
             {% if field.name == 'password' or field.name == 'password_verification' %}
             <div class="form-item">
-                <label for="{{ field.name }}">{{ field.label }}</label>
+                <label  for="{{ field.name }}">{{ field.label }}</label>
                 <input type="password" id="{{ field.name }}" name="{{ field.name }}"/>
             </div>
             {% else %}
             <div class="form-item">
-                <label for="{{ field.name }}">{{ field.label }}</label>
-                <input type="text" id="{{ field.name }}" name="{{ field.name }}"/>
+                <label  for="{{ field.name }}">{{ field.label }}</label>
+                <input type="text"  id="{{ field.name }}" name="{{ field.name }}"/>
             </div>
             {% endif %}
             {% endfor %}
             <div class="form-item">
-                <button type="button" id="submit-btn" class="btn" onclick="signUp()">Sign-up</button>
+                <button type="button" id="submit-btn" class="btn text-white" onclick="signUp()">Sign-up</button>
             </div>
         </form>
     </main>

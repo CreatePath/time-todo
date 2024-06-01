@@ -21,12 +21,22 @@ form {
 
 .form-item {
     width: 100%;
+    margin-top: 50px;
+}
+
+.form-item label {
+    position: absolute;
+    left: 300px;
+    color: #9999FF;
+    font-size: 20px;
 }
 
 .form-item input {
-    width: 300px;
+    width: 400px;
+    height: 40px;
     border: solid #CCCCCC 1px;
     border-radius: 0.5rem;
+    text-align: center;
 }
 
 #username-row {
@@ -42,11 +52,6 @@ form {
     border-radius: 0.5rem;
 }
 
-#register-btn {
-   color: #9999CC;
-   margin-top: 30px;
-}
-
 #title {
     color: #9999FF;
     text-align: center;
@@ -58,5 +63,5 @@ form {
 
 #submit-btn {
     background-color: #9999FF;
-
+    font-size: 25px;
 }
