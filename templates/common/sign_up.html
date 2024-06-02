@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load bootstrap_icons %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'common/css/sign_up.css' %}">
+{% endblock %}
+
+{% block content %}
+    <h1 id="title">Sign-up</h1>
+    <main>
+        <form method="post" id="sign-up-form" action="{% url 'common:sign-up' %}">
+            {% csrf_token %}
+            {% if form.erros %}
+            <div class="alert alert-danger" role="alert">
+                {% for field in form %}
+                {% if field.errors %}
+                <div>
+                    <strong>{{ field.label }}</strong>
+                    {{ field.errors }}
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% for field in form %}
+            {% if field.name == 'password' or field.name == 'password_verification' %}
+            <div class="form-item">
+                <label  for="{{ field.name }}">{{ field.label }}</label>
+                <input type="password" id="{{ field.name }}" name="{{ field.name }}"/>
+            </div>
+            {% else %}
+            <div class="form-item">
+                <label  for="{{ field.name }}">{{ field.label }}</label>
+                <input type="text"  id="{{ field.name }}" name="{{ field.name }}"/>
+            </div>
+            {% endif %}
+            {% endfor %}
+            <div class="form-item">
+                <button type="button" id="submit-btn" class="btn text-white" onclick="signUp()">Sign-up</button>
+            </div>
+        </form>
+    </main>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        const csrftoken = '{{ csrf_token }}';
+        const login_url = '{% url "common:login" %}'
+    </script>
+    <script type="text/javascript" src="{% static 'common/js/sign_up.js' %}"></script>
+{% endblock %}

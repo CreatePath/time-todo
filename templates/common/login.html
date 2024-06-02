@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load bootstrap_icons %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'common/css/login.css' %}">
+{% endblock %}
+
+{% block content %}
+    <h1 id="title">Login</h1>
+    <main>
+        <form method="post" action="{% url 'common:login' %}">
+            {% csrf_token %}
+            <div class="form-item">
+                <label for="username">{% bs_icon 'person-circle' size='1.5rem' %}</label>
+                <input type="text" id="username" name="username" placeholder="Enter your username"/>
+            </div>
+            <div class="form-item">
+                <label for="password">{% bs_icon '123' size='1.5rem' %}</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password"/>
+            </div>
+            <div class="form-item">
+                <button type="submit" id="submit-btn" class="btn text-white">Login</button>
+            </div>
+        </form>
+        <div><a href="{% url 'common:sign-up' %}" id="register-btn">회원 가입</a></div>
+    </main>
+{% endblock %}
+
+{% block scripts %}
+    {% if login_failed %}
+    <script>
+        alert("아이디 또는 비밀번호가 잘못되었습니다.");
+    </script>
+    {% endif %}
+    <script src="{% static 'common/js/login.js' %}"></script>
+{% endblock %}
