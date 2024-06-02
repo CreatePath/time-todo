@@ -1,8 +1,10 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.shortcuts import render, redirect
 from django.views import View
 from django.contrib.auth import authenticate, logout, login
 from django.contrib.auth.models import User
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm
 
 class LoginView(View):
@@ -46,9 +48,36 @@ class SignUpView(View):
 
 
 
-class MyPageView(View):
-    ...
+@login_required(redirect_field_name="/common/mypage")
+def mypage(request, username):
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        raise Http404("사용자를 찾을 수 없습니다.")
+
+    context = {"username": user.username,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "email": user.email,
+                "joined_date": user.date_joined}
+
+    return render(request, "common/mypage.html", context)
+
+
+@login_required(redirect_field_name="/common/mypage")
+def delete_account(request, username):
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        raise Http404("사용자를 찾을 수 없습니다.")
+
+    if request.user != user:
+        return JsonResponse({"message": "탈퇴 권한이 없습니다."}, status=401)
+
+    user.delete()
+    return JsonResponse({"message": "탈퇴하셨습니다."})
+
 
 def logout_view(request):
     logout(request)
-    return redirect("common:login")
+    return JsonResponse({"message": "로그아웃하셨습니다."}, status=200)

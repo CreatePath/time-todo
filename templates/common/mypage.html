@@ -27,48 +27,51 @@
 
 {% block scripts %}
     <script>
+        const csrf_token = '{{ csrf_token }}';
         function confirmLogout() {
             if (confirm("로그아웃 하시겠습니까?")) {
                 fetch("{% url 'common:logout' %}", {
                     method: "GET",
                     headers: {
-                        "X-CSRFToken": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        "X-CSRFToken": csrf_token,
                     }
                 })
                 .then(response => {
-                    if (response.ok) {
-                        alert("로그아웃되었습니다.");
-                        window.location.href = "{% url 'common:login' %}";
-                    } else {
+                    if (!response.ok) {
                         throw new Error("로그아웃에 실패하였습니다.");
                     }
+                    return response.json();
+                })
+                .then(data => {
+                    alert(data.message);
+                    window.location.href = "{% url 'common:login' %}";
                 })
                 .catch(error => {
-                    console.error("Error:", error);
-                    alert("로그아웃에 실패했습니다.");
+                    alert(error.message);
                 });
             }
         }
 
         function confirmDelete() {
-            if (confirm("정말 회원 탈퇴하시겠습니까?")) {
-                fetch("{% url 'common:delete_account' %}", {
+            if (confirm("정말 탈퇴하시겠습니까?")) {
+                fetch("{% url 'common:delete-account' username %}", {
                     method: "DELETE",
                     headers: {
-                        "X-CSRFToken": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        "X-CSRFToken": csrf_token,
                     }
                 })
                 .then(response => {
-                    if (response.ok) {
-                        alert("회원 탈퇴되었습니다.");
-                        window.location.href = "{% url 'common:login' %}";
-                    } else {
-                        throw new Error("회원 탈퇴에 실패하였습니다.");
+                    if (!response.ok) {
+                        throw new Error("회원탈퇴에 실패하였습니다.");
                     }
+                    return response.json();
+                })
+                .then(data => {
+                    alert(data.message);
+                    window.location.href = "{% url 'common:login' %}";
                 })
                 .catch(error => {
-                    console.error("Error:", error);
-                    alert("회원 탈퇴에 실패했습니다.");
+                    alert(error.message);
                 });
             }
         }
