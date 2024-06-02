@@ -29,5 +29,10 @@
 {% endblock %}
 
 {% block scripts %}
+    {% if login_failed %}
+    <script>
+        alert("아이디 또는 비밀번호가 잘못되었습니다.");
+    </script>
+    {% endif %}
     <script src="{% static 'common/js/login.js' %}"></script>
 {% endblock %}

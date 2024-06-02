@@ -7,17 +7,16 @@ from .forms import SignUpForm
 
 class LoginView(View):
     def get(self, request):
-        return render(request, "common/login.html")
+        return render(request, "common/login.html", context={"login_failed": False})
 
     def post(self, request):
         username = request.POST["username"]
         password = request.POST["password"]
         user = authenticate(request, username=username, password=password)
-        print(user)
         if user is not None:
             login(request, user)
             return redirect('/')
-        return redirect("common:login")
+        return render(request, "common/login.html", context={"login_failed": True})
 
 
 
