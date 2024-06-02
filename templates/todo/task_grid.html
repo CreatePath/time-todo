@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tasks and Grids</title>
+</head>
+<body>
+    <h2>Task List</h2>
+    <ul>
+        {% for task in tasks %}
+            <li>{{ task.name }} - {{ task.done|yesno:"Done,Not Done" }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Grid Data</h2>
+    <ul id="grid-list">
+        {% for grid in grids %}
+            <li class="grid" data-coloured="{{ grid.coloured }}" data-taskid="{{ grid.task_id }}">
+                Time: {{ grid.time }}:{{ grid.minute }}, Coloured: {{ grid.coloured|yesno:"Yes,No" }}, Task ID: {{ grid.task_id }}
+            </li>
+        {% endfor %}
+    </ul>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // grid-list라는 id를 가진 ul 요소에 이벤트 리스너를 추가하여 이벤트 위임 사용
+            document.getElementById('grid-list').addEventListener('click', function(event) {
+                // 클릭된 요소가 .grid 클래스를 가진 li 요소인지 확인
+                let target = event.target;
+                if (target && target.matches('.grid')) {
+                    console.log('클릭 이벤트 발생');
+                    let coloured = target.getAttribute('data-coloured') === 'True';
+                    let taskId = target.getAttribute('data-taskid');
+    
+                    if (coloured) {
+                        // Coloured가 true일 때, 수정 기능 실행
+                        editTask(taskId);
+                    } else {
+                        // Coloured가 false일 때, 추가 기능 실행
+                        addTask();
+                    }
+                }
+            });
+    
+            function editTask(taskId) {
+                // 수정 기능 구현, 예를 들어, 수정 폼으로 이동
+                console.log(`Edit task: ${taskId}`);
+                window.location.href = `/edit-task/${taskId}`;
+            }
+    
+            function addTask() {
+                // 추가 기능 구현, 예를 들어, 추가 폼으로 이동
+                console.log('Add new task');
+                window.location.href = '/add-task';
+            }
+        });
+    </script>
+    
+
+</body>
+</html>
+
+<div class="grid" id="grid_{{ grid.id }}" data-coloured="{{ grid.coloured }}" data-taskid="{{ grid.task_id }}">
+    <!-- Grid 내용 -->
+</div>
+
