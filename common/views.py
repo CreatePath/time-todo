@@ -44,6 +44,11 @@ class SignUpView(View):
 
         return JsonResponse({"message": "회원가입에 성공하였습니다!"}, status=200)
 
+
+
+class MyPageView(View):
+    ...
+
 def logout_view(request):
     logout(request)
     return redirect("common:login")
