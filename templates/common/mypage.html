@@ -18,7 +18,7 @@
         <p><strong>가입일:</strong> {{ joined_date }}</p>
     </div>
     <div class="buttons">
-        <button class="btn text-white" id="update-profile" onclick="location.href='/'">개인정보 변경</button>
+        <button class="btn text-white" id="update-profile" onclick="location.href='{{% url \'common:account\' username %}}'">개인정보 변경</button>
         <button class="btn text-white" id="logout" type="button" onclick="confirmLogout()">로그아웃</button>
         <button class="btn text-white" id="delete-profile" type="button" onclick="confirmDelete()">회원 탈퇴</button>
     </div>
@@ -54,7 +54,7 @@
 
         function confirmDelete() {
             if (confirm("정말 탈퇴하시겠습니까?")) {
-                fetch("{% url 'common:delete-account' username %}", {
+                fetch("{% url 'common:update-account' username %}", {
                     method: "DELETE",
                     headers: {
                         "X-CSRFToken": csrf_token,
