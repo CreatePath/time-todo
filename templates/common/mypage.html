@@ -17,10 +17,10 @@
         <p><strong>이메일:</strong> {{ email }}</p>
         <p><strong>가입일:</strong> {{ joined_date }}</p>
     </div>
-    <div>
-        <button onclick="location.href='/'">개인정보 변경</button>
-        <button type="button" onclick="confirmLogout()">로그아웃</button>
-        <button type="button" onclick="confirmDelete()">회원 탈퇴</button>
+    <div class="buttons">
+        <button class="btn text-white" id="update-profile" onclick="location.href='/'">개인정보 변경</button>
+        <button class="btn text-white" id="logout" type="button" onclick="confirmLogout()">로그아웃</button>
+        <button class="btn text-white" id="delete-profile" type="button" onclick="confirmDelete()">회원 탈퇴</button>
     </div>
     </main>
 {% endblock %}

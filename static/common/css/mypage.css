@@ -1,0 +1,76 @@
+body {
+    margin: 0;
+    border: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+input:focus {
+    outline:none;
+}
+
+main {
+    text-align: center;
+}
+
+#title {
+    font-size: 50px;
+    font-weight: bold;
+}
+
+.profile {
+    width: 100%;
+    margin-top: 45px;
+    text-align: center;
+    color: #9999FF;
+    font-size: 25px;
+}
+
+.profile h2 {
+    font-size: 40px;
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+
+.buttons {
+    text-align: center;
+}
+
+#username-row {
+    border-radius: 0.5rem;
+}
+
+#password-row {
+    border-radius: 0.5rem;
+}
+
+.form-item button {
+    width: 320px;
+    border-radius: 0.5rem;
+}
+
+#title {
+    color: #9999FF;
+    text-align: center;
+}
+
+form {
+    text-align: center;
+}
+
+#update-profile {
+    background-color: #9999FF;
+    font-size: 25px;
+}
+
+#logout {
+    background-color: #9999FF;
+    font-size: 25px;
+    margin:30px;
+}
+
+#delete-profile {
+    background-color: #9999FF;
+    font-size: 25px;
+}
