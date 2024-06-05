@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load bootstrap_icons %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'common/css/mypage.css' %}">
+{% endblock %}
+
+{% block content %}
+    <h1 id="title">마이페이지</h1>
+    <div class="profile">
+        <h2>개인정보</h2>
+        <p><strong>사용자명:</strong> {{ username }}</p>
+        <p><strong>비밀번호:</strong> ********</p> <!-- 보안상 *로 표시 -->
+        <p><strong>이름:</strong> {{ first_name }}{{ last_name }}</p>
+        <p><strong>이메일:</strong> {{ email }}</p>
+        <p><strong>가입일:</strong> {{ joined_date }}</p>
+    </div>
+    <div class="buttons">
+        <button class="btn text-white" id="update-profile" onclick="redirectToUpdate()">개인정보 변경</button>
+        <button class="btn text-white" id="logout" type="button" onclick="confirmLogout()">로그아웃</button>
+        <button class="btn text-white" id="delete-profile" type="button" onclick="confirmDelete()">회원 탈퇴</button>
+    </div>
+    </main>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        const csrf_token = '{{ csrf_token }}';
+
+        function redirectToUpdate() {
+            location.href = '{% url "common:account-update" username %}';
+        }
+
+        function confirmLogout() {
+            if (confirm("로그아웃 하시겠습니까?")) {
+                fetch("{% url 'common:logout' %}", {
+                    method: "GET",
+                    headers: {
+                        "X-CSRFToken": csrf_token,
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("로그아웃에 실패하였습니다.");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert(data.message);
+                    window.location.href = "{% url 'common:login' %}";
+                })
+                .catch(error => {
+                    alert(error.message);
+                });
+            }
+        }
+
+        function confirmDelete() {
+            if (confirm("정말 탈퇴하시겠습니까?")) {
+                fetch("{% url 'common:account' username %}", {
+                    method: "DELETE",
+                    headers: {
+                        "X-CSRFToken": csrf_token,
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("회원탈퇴에 실패하였습니다.");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert(data.message);
+                    window.location.href = "{% url 'common:login' %}";
+                })
+                .catch(error => {
+                    alert(error.message);
+                });
+            }
+        }
+    </script>
+{% endblock %}
