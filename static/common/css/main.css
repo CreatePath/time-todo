@@ -1,3 +1,5 @@
+/* ./main.css */
+
 body {
     font-family: Arial, sans-serif;
 }
@@ -9,6 +11,7 @@ body {
 
 header {
     text-align: center;
+    position: relative; /* My Page 버튼을 위해 position 추가 */
 }
 
 .navigation {
@@ -44,6 +47,11 @@ main {
     padding-bottom: 5px; /* 아이템 간격을 위한 추가 패딩 */
 }
 
+.todo-list li.active button {
+    display: inline-block;
+}
+
+
 .timetable {
     display: flex;
     flex: 2;
@@ -75,7 +83,7 @@ main {
     border: 1px solid #ccc;
     position: relative;
     cursor: pointer;
-    width: 20px;
+    width: 24px;
 }
 
 .time-slot.selected {
@@ -107,6 +115,11 @@ main {
     width: 80%;
 }
 
+#modal .modal-content .modal-title {
+    font-weight: bold;
+    font-size: 20px;
+}
+
 .close {
     color: #aaa;
     float: right;
@@ -119,4 +132,18 @@ main {
     color: black;
     text-decoration: none;
     cursor: pointer;
+}
+
+/* My Page 버튼 스타일 */
+#my-page-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #9999CC;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
 }
