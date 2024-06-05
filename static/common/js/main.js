@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (addToChecklist) {
             addToChecklistUI(eventName);
         }
-
+        create_task(0, 0, eventName, addToChecklist, 0);
         modal.style.display = 'none';
         clearSelection();
     });
@@ -202,6 +202,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function deleteEvent(index) {
         const slot = document.querySelector(`.time-slot[data-index="${index}"]`);
         slot.textContent = '';
+
+        delete_task(0);
     }
 
     // 이벤트 수정 함수
@@ -217,6 +219,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('end-time').value = endTime;
             document.getElementById('event-name').value = eventName;
             modal.style.display = 'block';
+
+            update_task(0, startTime, endTime, eventName, 0, 0);
         }
     }
 
@@ -225,6 +229,93 @@ document.addEventListener('DOMContentLoaded', () => {
         const hours = Math.floor(index / 6) + 6; // 시간 인덱스를 6시부터 시작하도록 조정
         const minutes = (index % 6) * 10;
         return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    }
+    
+    //시간을 인덱스로 변환하는 함수 필요
+
+    // 할 일을 데이터베이스에 저장하는 함수
+    function create_task(stime, etime, taskName, addToChecklist, done) {
+        fetch('/create_task/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken') // CSRF 토큰 설정
+            },
+            body: JSON.stringify({ stime, etime, name: taskName, add_to_checklist: addToChecklist, done })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('네트워크 응답에 문제가 있습니다.');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Task saved:', data);
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    }
+
+    function update_task(id, stime, etime, taskName, addToChecklist, done) {
+        fetch(`/update_task/${id}/`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken') // CSRF 토큰 설정
+            },
+            body: JSON.stringify({ stime, etime, name: taskName, add_to_checklist: addToChecklist, done })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('네트워크 응답에 문제가 있습니다.');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Task updated:', data);
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    }
+
+    function delete_task(id) {
+        fetch(`/delete_task/${id}/`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken') // CSRF 토큰 설정
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('네트워크 응답에 문제가 있습니다.');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Task deleted:', data);
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    }
+
+    // CSRF 토큰 가져오는 함수
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
     }
 });
 
