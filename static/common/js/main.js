@@ -21,6 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 초기화
     todoList.innerHTML = '';
+   
+    // 날짜 선택 전 "Time To Do" 표시
+    weekTitle.textContent = "Time To Do";
 
     // 시간 슬롯을 생성
     for (let i = 0; i < 24 * 6; i++) { // 하루에 24 슬롯, 주당 6일
@@ -34,8 +37,14 @@ document.addEventListener('DOMContentLoaded', () => {
         timeGrid.appendChild(timeSlot); // 시간 슬롯을 그리드에 추가
     }
 
-    // 날짜 선택 전 "Time To Do" 표시
-    weekTitle.textContent = "Time To Do";
+    // 인덱스를 시간 문자열로 변환하는 함수
+    function convertIndexToTime(index) {
+        const hours = Math.floor(index / 6) + 6; // 시간 인덱스를 6시부터 시작하도록 조정
+        const minutes = (index % 6) * 10;
+        const adjustedHours = hours >= 24 ? hours - 24 : hours;
+        const period = hours >= 24 ? 'AM' : 'PM';
+        return `${adjustedHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    }
 
     // 모달 닫기 버튼 클릭 이벤트 핸들러
     closeModal.onclick = function() {
@@ -71,19 +80,39 @@ document.addEventListener('DOMContentLoaded', () => {
         if (addToChecklist) {
             addToChecklistUI(eventName);
         }
-        create_task(0, 0, eventName, addToChecklist, 0);
+
         modal.style.display = 'none';
         clearSelection();
     });
 
-    // 할 일 목록에 추가하는 함수
-    function addToChecklistUI(taskName) {
-        if (!checkIfTaskExists(taskName)) {
-            const listItem = document.createElement('li');
-            listItem.innerHTML = `<input type="checkbox"> <span>${taskName}</span>`;
-            todoList.appendChild(listItem);
-        }
+// 할 일 목록에 항목을 추가하는 함수
+function addToChecklistUI(taskName) {
+    // 이미 존재하지 않는 경우에만 추가
+    if (!checkIfTaskExists(taskName)) {
+        // 새로운 리스트 아이템 생성
+        const listItem = document.createElement('li');
+        // 리스트 아이템 내용 설정
+        listItem.innerHTML = `<div class="task-item"><input type="checkbox"> <span>${taskName}</span><div class="buttons" style="display: none;"><button class="delete">Delete</button><button class="edit">Edit</button></div></div>`;
+        // 할 일 목록에 추가
+        todoList.appendChild(listItem);
+
+        // 리스트 아이템 클릭 시 버튼 토글
+        const taskItem = listItem.querySelector('.task-item');
+        taskItem.addEventListener('click', function(event) {
+            const target = event.target;
+            // 클릭된 요소가 체크박스가 아닌 경우에만 버튼 토글
+            if (!target.matches('input[type="checkbox"]')) {
+                const buttons = taskItem.querySelector('.buttons');
+                buttons.style.display = buttons.style.display === 'none' ? 'block' : 'none';
+            }
+        });
+
+        // Delete 버튼 클릭 시 항목 삭제
+        listItem.querySelector('.delete').addEventListener('click', function() {
+            listItem.remove();
+        });
     }
+}
 
     // 할 일 목록에 이미 존재하는지 확인하는 함수
     function checkIfTaskExists(taskName) {
@@ -116,8 +145,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 마우스 다운 이벤트 핸들러
     function handleMouseDown(event) {
+        const index = parseInt(event.target.dataset.index, 10);
+        if (selectedSlotsIndices.includes(index)) {
+            return; // 이미 선택된 슬롯 클릭 시 아무 동작도 하지 않음
+        }
         isDragging = true;
-        startSlot = parseInt(event.target.dataset.index, 10);
+        startSlot = index;
         lastSelectedSlot = event.target;
         event.target.classList.add('selected');
     }
@@ -130,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
             selectRange(startSlot, endSlot);
             if (lastSelectedSlot) {
                 const lastSlotIndex = parseInt(lastSelectedSlot.dataset.index, 10);
-                const currentIndex = parseInt(event.target.dataset.index, 10);
+                const currentIndex = parseInt(event.target.dataset.index);
                 const minIndex = Math.min(lastSlotIndex, currentIndex);
                 const maxIndex = Math.max(lastSlotIndex, currentIndex);
                 for (let i = minIndex; i <= maxIndex; i++) {
@@ -144,6 +177,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 마우스 업 이벤트 핸들러
     function handleMouseUp(event) {
+        if (!isDragging) {
+            return; // 드래그 상태가 아닌 경우 아무 동작도 하지 않음
+        }
         isDragging = false;
         modal.style.display = 'block';
 
@@ -166,156 +202,70 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = startSlot; i <= endSlot; i++) {
             selectedSlotsIndices.push(i);
         }
+        // 드래그 종료 후, 추가 이벤트 리스너 삭제
+        document.removeEventListener('mousemove', handleMouseOver);
+        // lastSelectedSlot 변수 업데이트
+         lastSelectedSlot = document.querySelector(`.time-slot[data-index="${endSlot}"]`);
+
     }
 
     // 마우스 우클릭 이벤트 핸들러
     function handleContextMenu(event) {
         event.preventDefault(); // 기본 우클릭 동작 방지
 
-        // 선택된 슬롯이 있고 마우스 우클릭한 슬롯이 선택된 슬롯이면
-        if (selectedSlotsIndices.length > 0 && selectedSlotsIndices.includes(parseInt(event.target.dataset.index))) {
-            const slotIndex = parseInt(event.target.dataset.index);
-            const slot = document.querySelector(`.time-slot[data-index="${slotIndex}"]`);
+        const slotIndex = parseInt(event.target.dataset.index, 10);
+        if (selectedSlotsIndices.includes(slotIndex)) {
             const contextMenu = document.createElement('div');
             contextMenu.classList.add('context-menu');
+
             const deleteButton = document.createElement('button');
             deleteButton.textContent = 'Delete';
             deleteButton.addEventListener('click', function() {
-                deleteEvent(slotIndex);
-                contextMenu.remove();
+                selectedSlotsIndices.forEach(index => {
+                    const slot = document.querySelector(`.time-slot[data-index="${index}"]`);
+                    slot.style.backgroundColor = ''; // 슬롯 배경 색상 초기화
+                    slot.textContent = ''; // 슬롯 텍스트 초기화
+                    slot.classList.remove('selected'); // 선택된 상태 해제
+                });
+                selectedSlotsIndices = []; // 선택된 슬롯 인덱스 초기화
+                contextMenu.remove(); // 컨텍스트 메뉴 삭제
             });
+
             const editButton = document.createElement('button');
             editButton.textContent = 'Edit';
             editButton.addEventListener('click', function() {
-                editEvent(slotIndex);
-                contextMenu.remove();
+                modal.style.display = 'block';
+                const startTimeIndex = Math.min(...selectedSlotsIndices);
+                const endTimeIndex = Math.max(...selectedSlotsIndices);
+
+                const startTime = convertIndexToTime(startTimeIndex);
+                const endTime = convertIndexToTime(endTimeIndex + 1);
+
+                document.getElementById('start-time').value = startTime;
+                document.getElementById('end-time').value = endTime;
+                contextMenu.remove(); // 컨텍스트 메뉴 삭제
             });
+
             contextMenu.appendChild(deleteButton);
             contextMenu.appendChild(editButton);
+            document.body.appendChild(contextMenu);
+
             contextMenu.style.top = `${event.clientY}px`;
             contextMenu.style.left = `${event.clientX}px`;
-            document.body.appendChild(contextMenu);
-        }
-    }
 
-    // 이벤트 삭제 함수
-    function deleteEvent(index) {
-        const slot = document.querySelector(`.time-slot[data-index="${index}"]`);
-        slot.textContent = '';
-
-        delete_task(0);
-    }
-
-    // 이벤트 수정 함수
-    function editEvent(index) {
-        const slot = document.querySelector(`.time-slot[data-index="${index}"]`);
-        const eventName = prompt('Enter new event name:');
-        if (eventName !== null) {
-            const startTimeIndex = selectedSlotsIndices[0];
-            const endTimeIndex = selectedSlotsIndices[selectedSlotsIndices.length - 1];
-            const startTime = convertIndexToTime(startTimeIndex);
-            const endTime = convertIndexToTime(endTimeIndex + 1);
-            document.getElementById('start-time').value = startTime;
-            document.getElementById('end-time').value = endTime;
-            document.getElementById('event-name').value = eventName;
-            modal.style.display = 'block';
-
-            update_task(0, startTime, endTime, eventName, 0, 0);
-        }
-    }
-
-    // 인덱스를 시간으로 변환하는 함수
-    function convertIndexToTime(index) {
-        const hours = Math.floor(index / 6) + 6; // 시간 인덱스를 6시부터 시작하도록 조정
-        const minutes = (index % 6) * 10;
-        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-    }
-    
-    //시간을 인덱스로 변환하는 함수 필요
-
-    // 할 일을 데이터베이스에 저장하는 함수
-    function create_task(stime, etime, taskName, addToChecklist, done) {
-        fetch('/create_task/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken') // CSRF 토큰 설정
-            },
-            body: JSON.stringify({ stime, etime, name: taskName, add_to_checklist: addToChecklist, done })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('네트워크 응답에 문제가 있습니다.');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Task saved:', data);
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
-    }
-
-    function update_task(id, stime, etime, taskName, addToChecklist, done) {
-        fetch(`/update_task/${id}/`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken') // CSRF 토큰 설정
-            },
-            body: JSON.stringify({ stime, etime, name: taskName, add_to_checklist: addToChecklist, done })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('네트워크 응답에 문제가 있습니다.');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Task updated:', data);
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
-    }
-
-    function delete_task(id) {
-        fetch(`/delete_task/${id}/`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken') // CSRF 토큰 설정
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('네트워크 응답에 문제가 있습니다.');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Task deleted:', data);
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
-    }
-
-    // CSRF 토큰 가져오는 함수
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
+            // 컨텍스트 메뉴 외부 클릭 시 메뉴 삭제
+            window.addEventListener('click', function onClickOutsideContext(event) {
+                if (!contextMenu.contains(event.target)) {
+                    contextMenu.remove();
+                    window.removeEventListener('click', onClickOutsideContext);
                 }
-            }
+            });
         }
-        return cookieValue;
     }
+    // ESC 키를 눌렀을 때 드래그 초기화
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            clearSelection();
+        }
+    });
 });
-
