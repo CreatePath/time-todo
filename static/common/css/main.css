@@ -1,0 +1,149 @@
+/* ./main.css */
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+header {
+    text-align: center;
+    position: relative; /* My Page 버튼을 위해 position 추가 */
+}
+
+.navigation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.date-picker {
+    font-size: 16px;
+}
+
+main {
+    display: flex;
+    gap: 20px;
+}
+
+.todo-list {
+    flex: 1;
+}
+
+.todo-list ul {
+    list-style: none;
+    padding: 0;
+}
+
+.todo-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px dotted #ccc; /* 점선 밑줄 추가 */
+    padding-bottom: 5px; /* 아이템 간격을 위한 추가 패딩 */
+}
+
+.todo-list li.active button {
+    display: inline-block;
+}
+
+
+.timetable {
+    display: flex;
+    flex: 2;
+}
+
+.time-labels {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-right: 10px;
+}
+
+.time-label {
+    height: 20px;
+    line-height: 20px;
+    margin-bottom: 1px;
+}
+
+.time-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(24, 20px);
+    gap: 1px;
+    background-color: #f0f0f0;
+}
+
+.time-slot {
+    background-color: white;
+    border: 1px solid #ccc;
+    position: relative;
+    cursor: pointer;
+    width: 24px;
+}
+
+.time-slot.selected {
+    background-color: #add8e6;
+}
+
+.time-slot.saved {
+    background-color: #ddd; /* 저장된 슬롯의 배경색 변경 */
+    cursor: not-allowed; /* 저장된 슬롯은 클릭 불가능하도록 변경 */
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+#modal .modal-content .modal-title {
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* My Page 버튼 스타일 */
+#my-page-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #9999CC;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+}
